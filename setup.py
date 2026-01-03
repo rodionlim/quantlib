@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 setup(
     name="quantlib",
     version="0.1.0",
-    description="Minimal CLI for quantlib functionalities",
+    description="quantlib - a quantitative finance library and cli",
     packages=find_packages(),
     python_requires=">=3.12",
     install_requires=[
@@ -13,7 +13,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-                "quantlib=cli.main:main",
+            "quantlib=cli.main:main",
         ]
     },
 )

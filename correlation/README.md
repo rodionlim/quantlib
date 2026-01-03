@@ -1,10 +1,10 @@
 # Correlation Calculation
 
-This module computes correlation matrices over time from return series.
+This module computes correlation matrices over time from data series.
 
 ## Usage
 
-Input CSV format: first column is a datetime index; remaining columns are returns.
+Input CSV format: first column is a datetime index; remaining columns are values to compute correlationagainst.
 
 ```bash
 cat returns.csv | quantlib corr > correlations.json
@@ -25,7 +25,7 @@ cat returns.csv | quantlib corr > correlations.json
 - `rolling`: use a fixed-size window that moves forward — old data drops out as the window advances.
 - `generate_fitting_dates`: builds the list of date ranges (start/end) the code will use to compute each correlation matrix.
 - `interval_frequency`: how often a new correlation matrix is reported (examples: `1M` = monthly, `3M` = quarterly, `12M` = yearly).
-- `default correlation method`: computes the exponential weight moving average of log returns before calculating correlations
+- `default correlation method`: computes the exponential weighted moving average of values before calculating correlations
 
 The section below gives more technical details.
 
