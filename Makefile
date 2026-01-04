@@ -58,9 +58,17 @@ ensure-venv:
 	fi
 
 # Print activation instructions and exit with an error (do not attempt to activate).
+# In CI (e.g., GITHUB_ACTIONS) we prefer running the venv without activating the shell,
+# so detect CI and don't fail the run. Also tolerate an existing .venv that isn't activated.
 ensure-activate:
 	@if [ -n "$$VIRTUAL_ENV" ]; then \
 		echo "Virtual environment is active: $$VIRTUAL_ENV"; \
+		exit 0; \
+	elif [ -n "$$CI" ] || [ -n "$$GITHUB_ACTIONS" ]; then \
+		echo "CI environment detected; using .venv/bin/python directly"; \
+		exit 0; \
+	elif [ -f .venv/bin/activate ]; then \
+		echo "Virtual environment exists but is not activated. Continuing without activating (use 'source .venv/bin/activate' locally to activate)."; \
 		exit 0; \
 	else \
 		echo "ERROR: virtual environment not activated."; \
@@ -109,7 +117,16 @@ distclean: clean
 
 test: ensure-venv ensure-activate
 	@echo "Running tests..."
-	@if [ -f .venv/bin/python ]; then .venv/bin/python -m pip install --upgrade pip pytest >/dev/null && .venv/bin/python -m pytest -q; else pytest -q; fi
+	@if command -v uv >/dev/null 2>&1 && [ -f .venv/pyvenv.cfg ]; then \
+		echo "Using uv-managed venv; assuming dependencies are installed via 'uv sync'"; \
+		.venv/bin/python -m pytest -q; \
+	elif [ -f .venv/bin/python ]; then \
+		.venv/bin/python -m pip install --upgrade pip pytest >/dev/null && \
+		.venv/bin/python -m pip install -e . >/dev/null && \
+		.venv/bin/python -m pytest -q; \
+	else \
+		pytest -q; \
+	fi
 
 publish: publish-pypi publish-docker
 

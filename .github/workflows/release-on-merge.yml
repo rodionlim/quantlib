@@ -1,0 +1,104 @@
+name: Release on merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  release:
+    if: github.event.pull_request.merged && !github.event.pull_request.head.repo.fork
+    environment: production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate full changelog and bump version
+        id: git-cliff-full
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: -v --bump --strip header
+        env:
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Generate current release notes (unreleased)
+        id: git-cliff-current
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --unreleased --bump -v --strip header
+        env:
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Bump `pyproject.toml` version (do not push yet)
+        run: |
+          VERSION=${{ steps.git-cliff-full.outputs.version }}
+          VERSION_NO_V=${VERSION#v}
+          echo "Setting project version to $VERSION_NO_V"
+          python - <<'PY'
+          from pathlib import Path
+          import re, sys
+          p = Path('pyproject.toml')
+          s = p.read_text(encoding='utf-8')
+          s2 = re.sub(r'(?m)^version\s*=\s*".*"$', f'version = "{VERSION_NO_V}"', s)
+          if s == s2:
+              print("pyproject.toml already has desired version")
+          else:
+              p.write_text(s2, encoding='utf-8')
+              print("pyproject.toml updated")
+          PY
+
+      - name: Run tests
+        run: make test
+
+      - name: Commit version and changelog
+        run: |
+          git config user.name 'GitHub Actions'
+          git config user.email 'github-actions@users.noreply.github.com'
+          git add pyproject.toml CHANGELOG.md || true
+          git commit -m "Bump version to ${{ steps.git-cliff-full.outputs.version }} [skip ci]" || echo "No changes to commit"
+          git push
+
+      - name: Tag version
+        run: |
+          git tag ${{ steps.git-cliff-full.outputs.version }} || echo "Tag already exists"
+          git push --tags
+
+      - name: Build Linux binary (PyInstaller)
+        run: |
+          make build
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Docker image
+        run: |
+          make publish-docker
+
+      - name: Publish to PyPI
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          make publish-pypi
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.git-cliff-full.outputs.version }}
+          name: ${{ steps.git-cliff-full.outputs.version }}
+          body: ${{ steps.git-cliff-current.outputs.content }}
+          allowUpdates: true
+          generateReleaseNotes: false
