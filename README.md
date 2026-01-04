@@ -23,3 +23,15 @@ From `quantlib/`:
 - `make build`
 
 Binary will be at `dist/quantlib`.
+
+## Docker
+
+Pull a published image from GitHub Container Registry:
+
+- `docker pull ghcr.io/rodionlim/quantlib-st:latest`
+
+Run a quick correlation query by piping a CSV into the container (one-liner):
+
+- `cat sample_data/returns_10x4.csv | docker run --rm -i ghcr.io/rodionlim/quantlib-st:latest corr --min-periods 3 --ew-lookback 10`
+
+When publishing the image the Makefile also tags and pushes `:latest` in addition to the versioned tag.

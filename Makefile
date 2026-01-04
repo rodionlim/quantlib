@@ -14,7 +14,8 @@ LINUX_BUILD_IMAGE ?= python:3.12-slim
 
 PYPI_DIST := dist-pypi
 # In CI, set DOCKER_IMAGE=ghcr.io/<owner>/<repo>
-DOCKER_IMAGE ?= rodionlim/quantlib-st
+# Default to GitHub Container Registry (ghcr.io). Override by setting DOCKER_IMAGE.
+DOCKER_IMAGE ?= ghcr.io/rodionlim/quantlib-st
 
 .PHONY: help build build-local build-linux build-windows clean distclean test ensure-venv ensure-activate version publish-pypi publish-docker
 
@@ -74,6 +75,8 @@ build-local: ensure-venv ensure-activate
 	@echo "Building locally using PyInstaller..."
 	@. .venv/bin/activate >/dev/null 2>&1 || true
 	@python -m pip install --upgrade pip pyinstaller >/dev/null
+	# Install the package into the venv so PyInstaller can discover imports from src/
+	@python -m pip install -e . >/dev/null
 	@if [ -f $(SPEC) ]; then \
 		pyinstaller $(PYINSTALLER_OPTS_SPEC) $(SPEC); \
 	else \
@@ -88,6 +91,8 @@ build-linux:
 	@docker run --rm -v "$(PWD)":/src -w /src $(LINUX_BUILD_IMAGE) sh -lc "\
 		if command -v apk >/dev/null 2>&1; then apk add --no-cache gcc musl-dev python3-dev; fi; \
 		if command -v uv >/dev/null 2>&1; then uv pip install --system pyinstaller; else python -m pip install --upgrade pip pyinstaller; fi; \
+		# Install the project so imports under src/ are discoverable by PyInstaller
+		python -m pip install .; \
 		if [ -f $(SPEC) ]; then pyinstaller $(PYINSTALLER_OPTS_SPEC) $(SPEC); else pyinstaller $(PYINSTALLER_OPTS) --name $(APP_NAME) $(ENTRY); fi\
 	"
 
@@ -121,8 +126,12 @@ publish-pypi:
 publish-docker:
 	@if [ -z "$(VERSION)" ]; then echo "ERROR: could not determine version"; exit 1; fi
 	@if ! echo "$(DOCKER_IMAGE)" | grep -Eq '/'; then \
-        echo "ERROR: DOCKER_IMAGE must be namespaced (e.g. username/$(APP_NAME))"; exit 1; \
+        echo "ERROR: DOCKER_IMAGE must be namespaced (e.g. ghcr.io/username/$(APP_NAME))"; exit 1; \
     fi
 	@echo "Building docker image $(DOCKER_IMAGE):$(VERSION)"
 	@docker build --build-arg VERSION=$(VERSION) -t $(DOCKER_IMAGE):$(VERSION) .
+	@echo "Pushing to registry $(DOCKER_IMAGE) (ensure you are logged in: 'echo $${GHCR_PAT} | docker login ghcr.io -u <user> --password-stdin')"
 	@docker push $(DOCKER_IMAGE):$(VERSION)
+	@echo "Tagging image as latest and pushing"
+	@docker tag $(DOCKER_IMAGE):$(VERSION) $(DOCKER_IMAGE):latest
+	@docker push $(DOCKER_IMAGE):latest

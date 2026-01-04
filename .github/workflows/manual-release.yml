@@ -5,6 +5,7 @@ on:
 
 jobs:
   release:
+    environment: production
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -32,7 +33,7 @@ jobs:
 
       - name: Build Linux binary (PyInstaller)
         run: |
-          make build-linux LINUX_BUILD_IMAGE=${{ env.LINUX_BUILD_IMAGE }}
+          make build
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -43,13 +44,13 @@ jobs:
 
       - name: Publish Docker image
         run: |
-          make publish-docker DOCKER_IMAGE=${{ env.DOCKER_IMAGE }}
+          make publish-docker
 
       - name: Publish to PyPI
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          make publish-pypi PYPI_TOKEN=$PYPI_TOKEN
+          make publish-pypi
 
       - name: Create or update GitHub Release
         uses: ncipollo/release-action@v1
