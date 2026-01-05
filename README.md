@@ -1,5 +1,9 @@
 # quantlib
 
+[![PyPI version](https://badge.fury.io/py/quantlib-st.svg)](https://badge.fury.io/py/quantlib-st)
+[![CI](https://github.com/rodionlim/quantlib-st/actions/workflows/ci.yml/badge.svg)](https://github.com/rodionlim/quantlib-st/actions/workflows/ci.yml)
+[![GHCR](https://img.shields.io/badge/ghcr-quantlib--st-blue?logo=github)](https://github.com/rodionlim/quantlib-st/pkgs/container/quantlib-st)
+
 Minimal, self-contained CLI tools and library for quantitative finance.
 
 ## Subcommands
@@ -35,3 +39,5 @@ Run a quick correlation query by piping a CSV into the container (one-liner):
 - `cat sample_data/returns_10x4.csv | docker run --rm -i ghcr.io/rodionlim/quantlib-st:latest corr --min-periods 3 --ew-lookback 10`
 
 When publishing the image the Makefile also tags and pushes `:latest` in addition to the versioned tag.
+
+## Package Sample Usage
