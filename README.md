@@ -20,14 +20,6 @@ From the repo root:
 
 This installs the `quantlib` command.
 
-## Build a single binary with PyInstaller
-
-From `quantlib/`:
-
-- `make build`
-
-Binary will be at `dist/quantlib`.
-
 ## Docker
 
 Pull a published image from GitHub Container Registry:
