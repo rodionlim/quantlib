@@ -44,18 +44,21 @@ jobs:
           VERSION=${{ steps.git-cliff-full.outputs.version }}
           VERSION_NO_V=${VERSION#v}
           echo "Setting project version to $VERSION_NO_V"
-          python - <<'PY'
+          python - <<PY
           from pathlib import Path
-          import re, sys
+          import re, os
+          version_no_v = os.environ.get('VERSION_NO_V', '0.1.0')
           p = Path('pyproject.toml')
           s = p.read_text(encoding='utf-8')
-          s2 = re.sub(r'(?m)^version\s*=\s*".*"$', f'version = "{VERSION_NO_V}"', s)
+          s2 = re.sub(r'(?m)^version\\s*=\\s*".*"$', f'version = "{version_no_v}"', s)
           if s == s2:
               print("pyproject.toml already has desired version")
           else:
               p.write_text(s2, encoding='utf-8')
-              print("pyproject.toml updated")
+              print(f"pyproject.toml updated to version {version_no_v}")
           PY
+        env:
+          VERSION_NO_V: ${{ steps.git-cliff-full.outputs.version }}
 
       - name: Run tests
         run: make test
@@ -73,6 +76,7 @@ jobs:
           git tag ${{ steps.git-cliff-full.outputs.version }} || echo "Tag already exists"
           git push --tags
 
+      # TODO: add binary to release artifacts
       - name: Build Linux binary (PyInstaller)
         run: |
           make build
