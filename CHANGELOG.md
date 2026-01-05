@@ -1,3 +1,13 @@
+## [1.1.1] - 2026-01-05
+
+### 🐛 Bug Fixes
+
+- Handle bug with ci not publishing with right versions
+
+### ⚙️ Miscellaneous Tasks
+
+- *(corr)* Update docstring for main function
+
 ## [1.1.0] - 2026-01-05
 
 ### 🚀 Features
