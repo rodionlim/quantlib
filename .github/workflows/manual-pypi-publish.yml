@@ -1,16 +1,18 @@
-name: Manual Docker Publish
+name: Manual PyPI Publish
 
 on:
   workflow_dispatch:
   workflow_call:
+    secrets:
+      PYPI_TOKEN:
+        required: true
 
 jobs:
-  publish-docker:
+  publish-pypi:
     environment: production
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
 
     steps:
       - name: Checkout
@@ -30,17 +32,8 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Build Linux binary (PyInstaller)
+      - name: Publish to PyPI
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          make build
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish Docker image
-        run: |
-          make publish-docker
+          make publish-pypi

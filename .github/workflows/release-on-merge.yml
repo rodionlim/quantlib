@@ -76,33 +76,52 @@ jobs:
           git tag ${{ steps.git-cliff-full.outputs.version }} || echo "Tag already exists"
           git push --tags
 
-      # TODO: add binary to release artifacts
-      - name: Build Linux binary (PyInstaller)
-        run: |
-          make build
+  publish-docker:
+    needs: release
+    uses: ./.github/workflows/manual-docker-publish.yml
+    permissions:
+      contents: write
+      packages: write
+    secrets: inherit
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
+  publish-pypi:
+    needs: release
+    uses: ./.github/workflows/manual-pypi-publish.yml
+    permissions:
+      contents: write
+    secrets: inherit
+
+  create-release:
+    needs: [release, publish-docker, publish-pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Publish Docker image
-        run: |
-          make publish-docker
-
-      - name: Publish to PyPI
+      - name: Generate current release notes
+        id: git-cliff-current
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --unreleased --bump -v --strip header
         env:
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Get version
+        id: version
         run: |
-          make publish-pypi
+          VERSION=$(python3 scripts/get_version.py)
+          echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.git-cliff-full.outputs.version }}
-          name: ${{ steps.git-cliff-full.outputs.version }}
+          tag: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
           body: ${{ steps.git-cliff-current.outputs.content }}
           allowUpdates: true
           generateReleaseNotes: false
