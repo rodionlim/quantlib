@@ -13,6 +13,8 @@ jobs:
     permissions:
       contents: write
       packages: write
+    outputs:
+      version: ${{ steps.git-cliff-full.outputs.version }}
 
     steps:
       - name: Checkout
@@ -79,6 +81,8 @@ jobs:
   publish-docker:
     needs: release
     uses: ./.github/workflows/manual-docker-publish.yml
+    with:
+      version: ${{ needs.release.outputs.version }}
     permissions:
       contents: write
       packages: write
@@ -87,6 +91,8 @@ jobs:
   publish-pypi:
     needs: release
     uses: ./.github/workflows/manual-pypi-publish.yml
+    with:
+      version: ${{ needs.release.outputs.version }}
     permissions:
       contents: write
     secrets: inherit

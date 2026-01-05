@@ -3,6 +3,10 @@ name: Manual PyPI Publish
 on:
   workflow_dispatch:
   workflow_call:
+    inputs:
+      version:
+        required: false
+        type: string
     secrets:
       PYPI_TOKEN:
         required: true
@@ -15,9 +19,19 @@ jobs:
       contents: write
 
     steps:
+      - name: Determine checkout ref
+        id: checkout_ref
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "ref=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=refs/heads/main" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ steps.checkout_ref.outputs.ref }}
           fetch-depth: 0
 
       - name: Set up Python
@@ -28,9 +42,21 @@ jobs:
       - name: Determine version
         id: version
         run: |
-          VERSION=$(python3 scripts/get_version.py)
+          if [ -n "${{ inputs.version }}" ]; then
+            INP=${{ inputs.version }}
+            if echo "$INP" | grep -q '^v'; then
+              TAG="$INP"
+              VERSION="${INP#v}"
+            else
+              TAG="v$INP"
+              VERSION="$INP"
+            fi
+          else
+            VERSION=$(python3 scripts/get_version.py)
+            TAG="v$VERSION"
+          fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Publish to PyPI
         env:
