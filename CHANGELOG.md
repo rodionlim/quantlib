@@ -1,3 +1,9 @@
+## [1.2.1] - 2026-01-12
+
+### 🐛 Bug Fixes
+
+- Optimize cli performance
+
 ## [1.2.0] - 2026-01-12
 
 ### 🚀 Features
