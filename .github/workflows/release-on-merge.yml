@@ -32,15 +32,6 @@ jobs:
           OUTPUT: CHANGELOG.md
           GITHUB_REPO: ${{ github.repository }}
 
-      - name: Generate current release notes (unreleased)
-        id: git-cliff-current
-        uses: orhun/git-cliff-action@v4
-        with:
-          config: cliff.toml
-          args: --unreleased --bump -v --strip header
-        env:
-          GITHUB_REPO: ${{ github.repository }}
-
       - name: Bump `pyproject.toml` version (do not push yet)
         run: |
           VERSION=${{ steps.git-cliff-full.outputs.version }}
@@ -109,25 +100,30 @@ jobs:
           fetch-depth: 0
 
       - name: Generate current release notes
+        # we use latest since we already created the tag in the `release` job
         id: git-cliff-current
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.toml
-          args: --unreleased --bump -v --strip header
+          args: --latest -v --strip header
         env:
           GITHUB_REPO: ${{ github.repository }}
 
-      - name: Get version
-        id: version
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build Linux binary (PyInstaller)
         run: |
-          VERSION=$(python3 scripts/get_version.py)
-          echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
+          make build
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.version.outputs.version }}
-          name: ${{ steps.version.outputs.version }}
+          tag: ${{ steps.git-cliff-current.outputs.version }}
+          name: ${{ steps.git-cliff-current.outputs.version }}
           body: ${{ steps.git-cliff-current.outputs.content }}
           allowUpdates: true
           generateReleaseNotes: false
+          artifacts: "dist/quantlib"

@@ -58,6 +58,6 @@ jobs:
           allowUpdates: true
           tag: ${{ steps.version.outputs.tag }}
           name: ${{ steps.version.outputs.tag }}
-          artifacts: "dist/*"
+          artifacts: "dist/quantlib"
           artifactErrorsFailBuild: true
           generateReleaseNotes: true
