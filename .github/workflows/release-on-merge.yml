@@ -109,6 +109,15 @@ jobs:
         env:
           GITHUB_REPO: ${{ github.repository }}
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build Linux binary (PyInstaller)
+        run: |
+          make build
+
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
@@ -117,3 +126,4 @@ jobs:
           body: ${{ steps.git-cliff-current.outputs.content }}
           allowUpdates: true
           generateReleaseNotes: false
+          artifacts: "dist/quantlib"
