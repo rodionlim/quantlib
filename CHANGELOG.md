@@ -1,3 +1,13 @@
+## [1.2.0] - 2026-01-12
+
+### 🚀 Features
+
+- *(build)* Add release binary to release notes
+
+### 🐛 Bug Fixes
+
+- Handle bug with release creation
+
 ## [1.1.1] - 2026-01-05
 
 ### 🐛 Bug Fixes
