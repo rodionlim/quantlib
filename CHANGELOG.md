@@ -1,3 +1,10 @@
+## [1.3.0] - 2026-01-13
+
+### 🚀 Features
+
+- *(corr)* Support price series instead of only returns
+- Remove step to compress into single exe for performance optimization
+
 ## [1.2.1] - 2026-01-12
 
 ### 🐛 Bug Fixes
