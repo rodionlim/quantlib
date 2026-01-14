@@ -1,3 +1,15 @@
+## [1.4.0] - 2026-01-14
+
+### 🚀 Features
+
+- Add version flag to cli
+- Add version flag to cli
+- *(estimators)* Add volatility estimators
+
+### 📚 Documentation
+
+- Update corr docs
+
 ## [1.3.0] - 2026-01-13
 
 ### 🚀 Features
