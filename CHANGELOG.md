@@ -1,3 +1,13 @@
+## [1.6.0] - 2026-01-16
+
+### 🚀 Features
+
+- Add default trading rules and new forecast utility
+
+### 📚 Documentation
+
+- Add base docs on system
+
 ## [1.5.0] - 2026-01-15
 
 ### 🚀 Features
