@@ -1,3 +1,10 @@
+## [1.7.0] - 2026-01-18
+
+### 🚀 Features
+
+- Add system skeleton with ported accounts
+- Fully port account and rawdata stage
+
 ## [1.6.0] - 2026-01-16
 
 ### 🚀 Features
