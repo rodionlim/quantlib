@@ -8,6 +8,7 @@ from quantlib_st.config.configdata import Config
 from quantlib_st.sysdata.sim.csv_futures_sim_test_data import CsvFuturesSimTestData
 from quantlib_st.systems.basesystem import System
 from quantlib_st.systems.accounts.accounts_stage import Account
+from quantlib_st.systems.rawdata import RawData
 
 
 def futures_system(
@@ -31,9 +32,7 @@ def futures_system(
         config = Config("systems.provided.config.test_account_config.yaml")
 
     system = System(
-        [
-            Account(),
-        ],
+        [Account(), RawData()],
         data,
         config,
     )

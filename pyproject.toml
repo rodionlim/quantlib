@@ -43,7 +43,7 @@ include = ["*"]
 
 [tool.pytest.ini_options]
 testpaths = ["src", "tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "src/quantlib_st"]
 
 [build-system]
 requires = ["setuptools>=80.9", "wheel"]

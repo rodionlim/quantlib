@@ -55,6 +55,28 @@ def drawdown(x: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFrame, pd.Series
     return x - maxx
 
 
+def apply_abs_min(x: pd.Series, min_value: float = 0.1) -> pd.Series:
+    """
+    >>> import datetime
+    >>> from syscore.pandas.pdutils import create_arbitrary_pdseries
+    >>> s1=create_arbitrary_pdseries([1,2,3,-1,-2,-3], date_start = datetime.datetime(2000,1,1))
+    >>> apply_abs_min(s1, 2)
+    2000-01-03    2
+    2000-01-04    2
+    2000-01-05    3
+    2000-01-06   -2
+    2000-01-07   -2
+    2000-01-10   -3
+    Freq: B, dtype: int64
+    """
+
+    ## Could also use clip but no quicker and this is more intuitive
+    x[(x < min_value) & (x > 0)] = min_value
+    x[(x > -min_value) & (x < 0)] = -min_value
+
+    return x
+
+
 def spread_out_annualised_return_over_periods(data_as_annual: pd.Series) -> pd.Series:
     """
     Spread an annualised return series into per-period returns.

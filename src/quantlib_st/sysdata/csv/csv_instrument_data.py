@@ -10,7 +10,7 @@ from quantlib_st.objects.instruments import (
 from quantlib_st.logging.logger import get_logger
 import pandas as pd
 
-INSTRUMENT_CONFIG_PATH = "data.futures.csvconfig"
+INSTRUMENT_CONFIG_PATH = "quantlib_st.data.futures.csvconfig"
 CONFIG_FILE_NAME = "instrumentconfig.csv"
 
 

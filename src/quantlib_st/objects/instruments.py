@@ -98,10 +98,9 @@ class instrumentMetaData(object):
 
     @classmethod
     def from_dict(instrumentMetaData, input_dict):
-        keys = list(input_dict.keys())
-        args_list = [input_dict[key] for key in keys]
-
-        return instrumentMetaData(*args_list)
+        valid_keys = [key for key in input_dict.keys() if key in META_FIELD_LIST]
+        filtered_dict = {key: input_dict[key] for key in valid_keys}
+        return instrumentMetaData(**filtered_dict)
 
     def __eq__(self, other):
         return self.as_dict() == other.as_dict()

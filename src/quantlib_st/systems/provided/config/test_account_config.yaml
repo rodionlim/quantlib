@@ -6,7 +6,7 @@
 # Trading rules
 #
 #
-percentage_vol_target: 20.0
+percentage_vol_target: 16.0
 notional_trading_capital: 250000
 base_currency: "USD"
 

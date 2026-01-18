@@ -1,5 +1,5 @@
 from copy import copy
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from quantlib_st.core.objects import get_class_name
 from quantlib_st.core.constants import arg_not_supplied

@@ -6,6 +6,7 @@ from quantlib_st.sysdata.csv.csv_adjusted_prices import csvFuturesAdjustedPrices
 from quantlib_st.sysdata.csv.csv_spot_fx import csvFxPricesData
 from quantlib_st.sysdata.csv.csv_instrument_data import csvFuturesInstrumentData
 from quantlib_st.sysdata.csv.csv_roll_parameters import csvRollParametersData
+from quantlib_st.sysdata.csv.csv_spread_costs import csvSpreadCostData
 
 from quantlib_st.sysdata.data_blob import dataBlob
 from quantlib_st.objects.spot_fx_prices import fxPrices
@@ -37,8 +38,9 @@ class CsvFuturesSimTestData(genericBlobUsingFuturesSimData):
         data = dataBlob(
             log=log,
             csv_data_paths=dict(
-                csvFuturesAdjustedPricesData="data.test.adjusted_prices_csv",
-                csvFuturesInstrumentData="data.test.csvconfig",
+                csvFuturesAdjustedPricesData="quantlib_st.data.test.adjusted_prices_csv",
+                csvFuturesInstrumentData="quantlib_st.data.test.csvconfig",
+                csvSpreadCostData="quantlib_st.data.test.csvconfig",
             ),
             class_list=[
                 csvFuturesAdjustedPricesData,
@@ -46,6 +48,7 @@ class CsvFuturesSimTestData(genericBlobUsingFuturesSimData):
                 csvFuturesInstrumentData,
                 csvFxPricesData,
                 csvRollParametersData,
+                csvSpreadCostData,
             ],
         )
 
