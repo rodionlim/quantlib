@@ -6,14 +6,16 @@ This system wires only the Account stage to keep things fast and focused.
 
 from quantlib_st.config.configdata import Config
 from quantlib_st.sysdata.sim.csv_futures_sim_test_data import CsvFuturesSimTestData
-from quantlib_st.systems.basesystem import System
 from quantlib_st.systems.accounts.accounts_stage import Account
+from quantlib_st.systems.basesystem import System
+from quantlib_st.systems.forecasting import Rules
 from quantlib_st.systems.rawdata import RawData
 
 
 def futures_system(
     data=None,
     config=None,
+    trading_rules=None,
 ):
     """
     Minimal system with only Account stage.
@@ -31,8 +33,17 @@ def futures_system(
     if config is None:
         config = Config("systems.provided.config.test_account_config.yaml")
 
+    stage_list = [
+        Account(),
+        RawData(),
+    ]
+
+    if trading_rules is not None:
+        rules = Rules(trading_rules)
+        stage_list.append(rules)
+
     system = System(
-        [Account(), RawData()],
+        stage_list,
         data,
         config,
     )

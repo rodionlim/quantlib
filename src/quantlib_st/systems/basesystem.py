@@ -1,4 +1,9 @@
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from quantlib_st.systems.forecasting import Rules
+    from quantlib_st.systems.accounts.accounts_stage import Account
+    from quantlib_st.systems.rawdata import RawData
 
 from quantlib_st.config.configdata import Config
 from quantlib_st.config.instruments import (
@@ -39,6 +44,10 @@ class System(object):
     The system only has one method 'of its own' which is get_instrument_list
 
     """
+
+    rules: "Rules"
+    accounts: "Account"
+    rawdata: "RawData"
 
     def __init__(
         self,
