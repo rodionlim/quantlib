@@ -1,3 +1,9 @@
+## [1.11.0] - 2026-01-27
+
+### 🚀 Features
+
+- *(futures)* Add minimal example to help with easier implementation
+
 ## [1.10.0] - 2026-01-24
 
 ### 🚀 Features
